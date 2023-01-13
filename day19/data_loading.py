@@ -7,7 +7,7 @@ def load_blueprints(filepath: str) -> list[Blueprint]:
     blueprints = []
     with open(INPUT_FILE_PATH) as file:
         lines = file.readlines()
-        pattern = []
+
         for line in lines:
             match line.split():
                 case [
