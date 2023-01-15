@@ -111,7 +111,7 @@ class State:
 
     def to_dataframe(self) -> pd.DataFrame:
         resources_types = ["ore", "clay", "obsidian", "geode"]
-        columns = ["resources", "robots"]
+        columns = ["assets", "robots"]
 
         leveled_columns = [(f"{self.time}m", "S"), (f"{self.time}m", "R")]
 

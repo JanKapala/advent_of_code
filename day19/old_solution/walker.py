@@ -1,16 +1,12 @@
-import random
-
-import pandas as pd
 from IPython.core.display_functions import display
 from torch.utils.tensorboard import SummaryWriter
 
-from day19.actions import Action
+from day19.old_solution.actions import Action
 from memory import Memory
-from blueprint import Blueprint
 
 MAX_TIME = 24  # TODO: do it better
 
-writer = SummaryWriter(log_dir="./runs")
+writer = SummaryWriter(log_dir="../runs")
 
 
 def walker(memory: Memory):

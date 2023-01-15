@@ -1,6 +1,6 @@
 from blueprint import Blueprint, OreRobot, ClayRobot, ObsidianRobot, GeodeRobot
 
-INPUT_FILE_PATH = "input.txt"  # TODO: do it better
+INPUT_FILE_PATH = "../input.txt"  # TODO: do it better
 
 
 def load_blueprints(filepath: str) -> list[Blueprint]:

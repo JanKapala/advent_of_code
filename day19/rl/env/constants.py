@@ -1,3 +1,10 @@
+# pylint: disable=fixme
+
+"""Common constants"""
+
+# TODO: it would be ideal if this module doesn't exist.
+#  try to move each constant to its best location (ideally near the origin of usage)
+
 import numpy as np
 
 STONES = "stones"

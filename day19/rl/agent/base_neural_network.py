@@ -2,10 +2,9 @@
 """Abstract neural network"""
 
 from abc import ABC
-from typing import Tuple
 from itertools import chain
 
-from torch.nn import Linear, BatchNorm1d, ReLU
+from torch.nn import BatchNorm1d, Linear, ReLU
 
 
 class BaseNeuralNetwork(ABC):
@@ -15,7 +14,7 @@ class BaseNeuralNetwork(ABC):
         self,
         input_dim: int,
         output_dim: int,
-        layers_sizes: Tuple[int],
+        layers_sizes: list[int],
         inc_batchnorm: bool = True,
         activation=ReLU,
     ):

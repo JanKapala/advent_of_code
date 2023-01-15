@@ -1,72 +1,114 @@
+# pylint: disable=fixme, too-many-arguments, non-ascii-name
+
+"""Simulation of the dynamics between an Agent and an Environment that enables experimentation."""
+
+import os
 import random
 import string
+from datetime import datetime
 
 import torch
+from gymnasium import Env
 from torch.utils.tensorboard import SummaryWriter
-from tqdm.auto import trange, tqdm
+from tqdm.auto import tqdm, trange
 
-from day19.rl.agent.rl_agent import TD3Agent
+from day19.constants import DAY_19_INPUT_FILE_PATH, DAY_19_LOG_DIR
+from day19.rl.agent.td3_agent import TD3Agent
+from day19.rl.data_loading import extract_global_data, load_blueprints
+from day19.rl.env.environment import NotEnoughMineralsEnv
+
+# TODO:
+#  Rethink simulation, agent and environment relations - create new architecture that:
+#  -> takes into account agent self reflection
+#  -> allows for multiple and dynamically spawned agents
+#  -> deals with applying of multiple actions in the same timestep.
+#  Reimplement simulation
+
+# TODO: hyperparameters tunning
+# TODO: Population based training
+# TODO: parallelization, local/cluster deployments
 
 
 def simulate(
-    env,
-    agent,
-    episodes,
+    env: Env,
+    agent: TD3Agent,  # TODO: create an abstract agent class
+    episodes: int,
+    max_episode_steps: int,
     render=True,
-    max_episode_steps=None,
-    episodes_pb=True,
-    steps_pb=True,
-):
-    for _ in trange(episodes, disable=(not episodes_pb)):
-        S = env.reset()
+    episodes_pb=True,  # TODO: maybe remove this argument.
+    steps_pb=True,  # TODO: maybe remove this argument.
+) -> None:  # TODO: Maybe simulation should return some results that could be analysed/saved.
+    """Simulate dynamics between an Agent and an Environment.
+
+    :param env: Environment.
+    :param agent: Reinforcement Learning Agent.
+    :param episodes: Number of episodes to play.
+    :param max_episode_steps: Max number of steps in the episode.
+    :param render: Flag, if true then episodes will be rendered.
+    :param episodes_pb: TODO
+    :param steps_pb: TODO
+    :return:
+    """
+
+    for _ in trange(episodes, position=0, leave=True, disable=(not episodes_pb)):
+        obs, _ = env.reset()
         episode_steps = 0
 
-        with tqdm(total=env.interactions_per_user, disable=(not steps_pb)) as pbar:
+        with tqdm(total=max_episode_steps, position=1, leave=False, disable=(not steps_pb)) as pbar:
             while True:
                 if render:
                     env.render()
 
-                A = agent.act(S)
-                S_prim, R, d, _ = env.step(A)
+                action = agent.act(obs)
+                next_obs, reward, terminated, _, _ = env.step(action)
 
-                if max_episode_steps is not None and episode_steps >= max_episode_steps:
-                    d = True
-                agent.observe(R, S_prim, d)
+                if episode_steps >= max_episode_steps:
+                    terminated = True
+                agent.observe(reward, next_obs, terminated)
 
-                if S_prim is not None:
-                    S = S_prim
-                    episode_steps += 1
-                    pbar.update(1)
-                if d:
+                obs = next_obs
+                episode_steps += 1
+                pbar.update(1)
+
+                if terminated:
                     break
     env.close()
 
 
-def get_random_string(length):
-    # choose from all lowercase letter
-    letters = string.ascii_lowercase
-    result_str = "".join(random.choice(letters) for i in range(length))
-    return result_str
-
-
-LOG_DIR = "./runs/"
+def generate_random_string(length):  # pylint: disable=missing-function-docstring
+    return "".join(random.choices(string.ascii_lowercase, k=length))
 
 
 if __name__ == "__main__":
+    # General
+    SEED = 0
+    torch.manual_seed(SEED)
+    random.seed(SEED)
 
-    seed = 0
-    torch.manual_seed(seed)
-    random.seed(seed)
-
-    # real_logdir = LOG_DIR + "/" + get_random_string(20)
-    real_logdir = LOG_DIR
-
+    real_logdir = os.path.join(DAY_19_LOG_DIR, datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
     writer = SummaryWriter(log_dir=real_logdir)
 
+    # Environment
+    blueprints = load_blueprints(DAY_19_INPUT_FILE_PATH)
+    robots_costs_boundaries, costs_boundaries = extract_global_data(blueprints)
+
+    MAX_TIME = 24
+
+    environment = NotEnoughMineralsEnv(
+        blueprint=blueprints[0],
+        max_time=MAX_TIME,
+        robots_costs_boundaries=robots_costs_boundaries,
+    )
+
+    layers = [14, 10, 6]
+
+    # Agent
     training_agent = TD3Agent(
-        actor_layer_sizes=(64, 128, 256),  # (64, 128, 64),
-        critic_layer_sizes=(64, 128, 256),  # (64, 128, 64),
-        replay_buffer_max_size=1e6,
+        action_space=environment.action_space,
+        observation_space=environment.observation_space,
+        actor_layer_sizes=layers,  # (64, 128, 64),
+        critic_layer_sizes=layers,  # (64, 128, 64),
+        replay_buffer_max_size=int(10e4),
         batch_size=64,
         γ=1,
         μ_θ_α=1e-5,
@@ -82,24 +124,31 @@ if __name__ == "__main__":
         target_noise=0.25,
         noise_clip=0.5,
         policy_delay=2,
-        act_max=1,
-        act_min=-1,
     )
 
+    # Training
     simulate(
-        env,
+        environment,
         training_agent,
-        episodes=400,
+        episodes=800,
         render=False,
-        max_episode_steps=None,
+        max_episode_steps=MAX_TIME,
     )
 
+    # Evaluation
     training_agent.exploration = False
-
     simulate(
-        env,
+        environment,
         training_agent,
         episodes=100,
         render=False,
-        max_episode_steps=None,
+        max_episode_steps=MAX_TIME,
     )
+
+
+# TODO:
+#  -> playable pygame to make sure environment is valid
+#  -> prioritized replay buffer
+#  -> noise, clamping, exploration <- there is a mess
+#  -> repo related stuff
+#  -> publish env

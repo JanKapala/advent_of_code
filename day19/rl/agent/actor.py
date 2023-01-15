@@ -1,24 +1,22 @@
-# pylint: disable=missing-module-docstring, invalid-name, too-many-arguments, no-member
-
-from typing import Tuple
+# pylint: disable=missing-module-docstring, invalid-name, too-many-arguments, no-member, fixme
 
 import torch
-from torch.nn import Module, Sequential, ReLU
+from torch import Tensor
+from torch.nn import Module, ReLU, Sequential
 
-from recommender.engines.base.base_neural_network import BaseNeuralNetwork
+from day19.rl.agent.base_neural_network import BaseNeuralNetwork
 
-ACTOR_V1 = "actor_v1"
-ACTOR_V2 = "actor_v2"
+# TODO: generally take care of fixme offences in the whole project (maybe exclude it?)
 
 
 class Actor(Module, BaseNeuralNetwork):
-    """Actor neural network representing a deterministic policy used by RLAgent"""
+    """Actor neural network representing a deterministic policy used by the TD3 Agent"""
 
     def __init__(
         self,
-        layer_sizes: Tuple[int] = (256, 512, 256),
-        act_max: float = 1.0,
-        act_min: float = -1.0,
+        input_dim: int,
+        output_dim: int,
+        layer_sizes: list[int],
     ):
         """
         Args:
@@ -31,42 +29,14 @@ class Actor(Module, BaseNeuralNetwork):
         )
 
         self.network = Sequential(*layers)
-        self.act_max = act_max
-        self.act_min = act_min
 
-    def forward(self, state: Tuple[(torch.Tensor,) * 3]) -> torch.Tensor:
-        """
-        Performs forward propagation.
+    def forward(self, O: Tensor) -> Tensor:
+        """Infer an action based on the observation.
 
-        Args:
-            state:
-                user: Embedded user content tensor of shape
-                 [batch_size, UE]
-                services_history: Services history tensor of shape
-                 [batch_size, N, SE]
-                search_data_mask: Batch of search data masks of shape
-                 [batch_size, I]
-
-        Returns:
-            weights: Weights tensor used for choosing action from the
-             itemspace.
+        :param O: Observation tensor.
+        :return: Action Tensor.
         """
 
-        user, services_history, mask = state
-
-        services_history = self.history_embedder(services_history)
-        x = torch.cat([user, services_history, mask], dim=1)
-        x = self.network(x)
-
-        weights = x.reshape(-1, self.K, self.SE)
-        weights = torch.tanh(weights)
-
-        # https://stackoverflow.com/questions/345187/math-mapping-numbers
-        # Mapping to range (self.act_min, self.act_max) using 'two-point form'
-        # linear transform.
-        # Old bounds are (-1, 1) since weights come from a hyperbolic tangent
-        scaled_weights = (
-            (weights + 1) * (self.act_max - self.act_min)
-        ) / 2 + self.act_min
-
-        return scaled_weights
+        return torch.softmax(
+            self.network(O), dim=1
+        )  # TODO: maybe the bug is here, in the softmax dim

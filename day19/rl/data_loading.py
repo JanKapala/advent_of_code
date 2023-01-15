@@ -1,15 +1,17 @@
+"""Utilities for ingestion an input data."""
+
 from math import inf
 
 from day19.rl.env.blueprints import Blueprint
+from day19.rl.env.constants import CLAY, GEODE, HIGH, LOW, OBSIDIAN, ORE, ROBOT_TYPES
 from day19.rl.env.utils import PrettyDict
-from day19.rl.env.constants import ORE, CLAY, OBSIDIAN, GEODE, ROBOT_TYPES, LOW, HIGH
-
-INPUT_FILE_PATH = "./../../input.txt"  # TODO: do it better
 
 
-def load_blueprints(filepath: str) -> list[Blueprint]:
+def load_blueprints(  # pylint: disable=missing-function-docstring
+    filepath: str,
+) -> list[Blueprint]:
     blueprints = []
-    with open(filepath) as file:
+    with open(filepath, encoding="UTF-8") as file:
         lines = file.readlines()
 
         for line in lines:
@@ -55,7 +57,7 @@ def load_blueprints(filepath: str) -> list[Blueprint]:
                             int(obsidian_ore),
                             int(obsidian_clay),
                             int(geode_ore),
-                            int(geode_obsidian)
+                            int(geode_obsidian),
                         )
                     )
 
@@ -64,43 +66,64 @@ def load_blueprints(filepath: str) -> list[Blueprint]:
     return blueprints
 
 
-def extract_global_data(blueprints: list[Blueprint]):
-    robots_costs_boundaries = PrettyDict({
-        ORE: {
-            ORE: {LOW: inf, HIGH: -inf}
-        },
-        CLAY: {
-            ORE: {LOW: inf, HIGH: -inf}
-        },
-        OBSIDIAN: {
-            ORE: {LOW: inf, HIGH: -inf},
-            CLAY: {LOW: inf, HIGH: -inf}
-        },
-        GEODE: {
-            ORE: {LOW: inf, HIGH: -inf},
-            OBSIDIAN: {LOW: inf, HIGH: -inf}
-        },
-    })
+RobotsCostsBoundaries = dict[str, dict[str, dict[str, int]]]
+CostsBoundaries = dict[str, dict[str, int]]
 
-    costs_boundaries = PrettyDict({
-        ORE: {LOW: inf, HIGH: -inf},
-        CLAY: {LOW: inf, HIGH: -inf},
-        OBSIDIAN: {LOW: inf, HIGH: -inf},
-    })
+
+def extract_global_data(
+    blueprints: list[Blueprint],
+) -> tuple[RobotsCostsBoundaries, CostsBoundaries]:
+    """Extract `robots_costs_boundaries` and `costs_boundaries` from all blueprints.
+    WARNING: Returned data contains global statistics so make sure that all possible
+     or at least representative blueprints have been provided.
+
+    :param blueprints: List of all possible or at least representative blueprints.
+    :return: robots_costs_boundaries, costs_boundaries - min and max costs of each
+     robot type and min and max costs generally.
+    """
+
+    robots_costs_boundaries = PrettyDict(
+        {
+            ORE: {ORE: {LOW: inf, HIGH: -inf}},
+            CLAY: {ORE: {LOW: inf, HIGH: -inf}},
+            OBSIDIAN: {ORE: {LOW: inf, HIGH: -inf}, CLAY: {LOW: inf, HIGH: -inf}},
+            GEODE: {ORE: {LOW: inf, HIGH: -inf}, OBSIDIAN: {LOW: inf, HIGH: -inf}},
+        }
+    )
+
+    costs_boundaries = PrettyDict(
+        {
+            ORE: {LOW: inf, HIGH: -inf},
+            CLAY: {LOW: inf, HIGH: -inf},
+            OBSIDIAN: {LOW: inf, HIGH: -inf},
+        }
+    )
 
     for blueprint in blueprints:
-        for robot, stone in [(ORE, ORE), (CLAY, ORE), (OBSIDIAN, ORE), (OBSIDIAN, CLAY), (GEODE, ORE),
-                             (GEODE, OBSIDIAN)]:
-            robots_costs_boundaries[robot][stone][LOW] = min(blueprint[robot][stone],
-                                                             robots_costs_boundaries[robot][stone][LOW])
-            robots_costs_boundaries[robot][stone][HIGH] = max(blueprint[robot][stone],
-                                                              robots_costs_boundaries[robot][stone][HIGH])
+        for robot, stone in [
+            (ORE, ORE),
+            (CLAY, ORE),
+            (OBSIDIAN, ORE),
+            (OBSIDIAN, CLAY),
+            (GEODE, ORE),
+            (GEODE, OBSIDIAN),
+        ]:
+            robots_costs_boundaries[robot][stone][LOW] = min(
+                blueprint[robot][stone], robots_costs_boundaries[robot][stone][LOW]
+            )
+            robots_costs_boundaries[robot][stone][HIGH] = max(
+                blueprint[robot][stone], robots_costs_boundaries[robot][stone][HIGH]
+            )
 
     for robot in ROBOT_TYPES:
         for stone in (ORE, CLAY, OBSIDIAN):
-            costs_boundaries[stone][LOW] = min(robots_costs_boundaries[robot].get(stone, {}).get(LOW, inf),
-                                               costs_boundaries[stone][LOW])
-            costs_boundaries[stone][HIGH] = max(robots_costs_boundaries[robot].get(stone, {}).get(HIGH, -inf),
-                                                costs_boundaries[stone][HIGH])
+            costs_boundaries[stone][LOW] = min(
+                robots_costs_boundaries[robot].get(stone, {}).get(LOW, inf),
+                costs_boundaries[stone][LOW],
+            )
+            costs_boundaries[stone][HIGH] = max(
+                robots_costs_boundaries[robot].get(stone, {}).get(HIGH, -inf),
+                costs_boundaries[stone][HIGH],
+            )
 
     return robots_costs_boundaries, costs_boundaries
