@@ -21,6 +21,8 @@ Record: TypeAlias = tuple[Tensor, Tensor, Tensor, Tensor, Tensor]
 # TODO: generally do something with pylint `no-member` and `no-name-in-module`
 #  offences everything in pytorch causes it xD
 
+# TODO: implement in optimal way: no observations duplications
+
 
 class ReplayBuffer:
     """Replay Buffer used in the TD3 Agent"""
@@ -53,7 +55,8 @@ class ReplayBuffer:
 
         names = [OBSERVATION, ACTION, REWARD, NEXT_OBSERVATION, DONE]
         result = tuple(
-            torch.concat([example[key] for example in raw_batch], dim=0) for key in names
+            torch.concat([example[key] for example in raw_batch], dim=0)
+            for key in names
         )
         return cast(Record, result)
 

@@ -25,6 +25,7 @@ from day19.rl.env.observation import Observation
 # TODO: holistic types and dtype handling
 # TODO: enable some pylint checkers that has been disabled currently.
 
+# TODO: tree search?
 
 # noinspection NonAsciiCharacters
 class TD3Agent:
@@ -209,7 +210,11 @@ class TD3Agent:
                 self._train_step()
 
     def _obs2tensor(self, observation: Observation) -> Tensor:
-        return Tensor(flatten(self.observation_space, observation)).unsqueeze(0).to(self.device)
+        return (
+            Tensor(flatten(self.observation_space, observation))
+            .unsqueeze(0)
+            .to(self.device)
+        )
 
     # noinspection PyMethodMayBeStatic
     def _reward2tensor(self, R: float) -> Tensor:
@@ -285,7 +290,9 @@ class TD3Agent:
             self.μ_θ.train()
             A = self.μ_θ(S)
             self.Q1_Φ.eval()
-            action_value = self.Q1_Φ(S, A)  # TODO: maybe use: with set_grad_enabled(False)
+            action_value = self.Q1_Φ(
+                S, A
+            )  # TODO: maybe use: with set_grad_enabled(False)
             μ_θ_ℒ = self.μ_θ_ℒ_function(action_value)
             self._log_scalar("REPLAY BUFFER/Q(A) (mean)", torch.mean(action_value))
 

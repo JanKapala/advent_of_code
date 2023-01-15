@@ -4,8 +4,11 @@
 
 # TODO: it would be ideal if this module doesn't exist.
 #  try to move each constant to its best location (ideally near the origin of usage)
+import os
 
 import numpy as np
+
+from day19.constants import DAY_19_ROOT_DIR
 
 STONES = "stones"
 ROBOTS = "robots"
@@ -22,3 +25,4 @@ STATE = "state"
 BLUEPRINT = "blueprint"
 MAX_TIME = "max_time"
 DTYPE = np.int64
+ASSETS_PATH = os.path.join(DAY_19_ROOT_DIR, "rl/env/rendering/assets")

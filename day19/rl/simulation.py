@@ -6,6 +6,7 @@ import os
 import random
 import string
 from datetime import datetime
+from time import sleep
 
 import torch
 from gymnasium import Env
@@ -34,7 +35,7 @@ def simulate(
     agent: TD3Agent,  # TODO: create an abstract agent class
     episodes: int,
     max_episode_steps: int,
-    render=True,
+    render: bool | str = True,
     episodes_pb=True,  # TODO: maybe remove this argument.
     steps_pb=True,  # TODO: maybe remove this argument.
 ) -> None:  # TODO: Maybe simulation should return some results that could be analysed/saved.
@@ -54,10 +55,13 @@ def simulate(
         obs, _ = env.reset()
         episode_steps = 0
 
-        with tqdm(total=max_episode_steps, position=1, leave=False, disable=(not steps_pb)) as pbar:
+        with tqdm(
+            total=max_episode_steps, position=1, leave=False, disable=(not steps_pb)
+        ) as pbar:
             while True:
-                if render:
+                if render is not None:
                     env.render()
+                    # sleep(1)
 
                 action = agent.act(obs)
                 next_obs, reward, terminated, _, _ = env.step(action)
@@ -85,7 +89,9 @@ if __name__ == "__main__":
     torch.manual_seed(SEED)
     random.seed(SEED)
 
-    real_logdir = os.path.join(DAY_19_LOG_DIR, datetime.now().strftime("%Y-%m-%dT%H:%M:%S"))
+    real_logdir = os.path.join(
+        DAY_19_LOG_DIR, datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    )
     writer = SummaryWriter(log_dir=real_logdir)
 
     # Environment
@@ -93,16 +99,16 @@ if __name__ == "__main__":
     robots_costs_boundaries, costs_boundaries = extract_global_data(blueprints)
 
     MAX_TIME = 24
-
+    render_mode = "human"
     environment = NotEnoughMineralsEnv(
         blueprint=blueprints[0],
         max_time=MAX_TIME,
         robots_costs_boundaries=robots_costs_boundaries,
+        render_mode=render_mode
     )
 
-    layers = [14, 10, 6]
-
     # Agent
+    layers = [14, 10, 6]
     training_agent = TD3Agent(
         action_space=environment.action_space,
         observation_space=environment.observation_space,
@@ -126,24 +132,33 @@ if __name__ == "__main__":
         policy_delay=2,
     )
 
-    # Training
+    # Render test
     simulate(
         environment,
         training_agent,
-        episodes=800,
-        render=False,
+        episodes=1,
+        render=render_mode,
         max_episode_steps=MAX_TIME,
     )
 
-    # Evaluation
-    training_agent.exploration = False
-    simulate(
-        environment,
-        training_agent,
-        episodes=100,
-        render=False,
-        max_episode_steps=MAX_TIME,
-    )
+    # # Training
+    # simulate(
+    #     environment,
+    #     training_agent,
+    #     episodes=800,
+    #     render=False,
+    #     max_episode_steps=MAX_TIME,
+    # )
+    #
+    # # Evaluation
+    # training_agent.exploration = False
+    # simulate(
+    #     environment,
+    #     training_agent,
+    #     episodes=100,
+    #     render=False,
+    #     max_episode_steps=MAX_TIME,
+    # )
 
 
 # TODO:

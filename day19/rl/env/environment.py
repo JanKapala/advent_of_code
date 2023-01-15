@@ -10,6 +10,8 @@ from gymnasium import Env
 from gymnasium.core import RenderFrame
 from gymnasium.envs.registration import EnvSpec
 
+from day19.constants import DAY_19_INPUT_FILE_PATH
+from day19.rl.data_loading import load_blueprints, extract_global_data
 from day19.rl.env.action import (
     ACTION_TO_ROBOT_TYPE_MAPPING,
     Action,
@@ -18,6 +20,7 @@ from day19.rl.env.action import (
 from day19.rl.env.blueprints import Blueprint
 from day19.rl.env.constants import GEODE, ROBOTS, STONE_TYPES, STONES, TIME
 from day19.rl.env.observation import Observation, generate_observation_space
+from day19.rl.env.rendering.renderer import Renderer
 from day19.rl.env.state import State
 
 # TODO: play utility from gymnasium
@@ -67,6 +70,7 @@ class NotEnoughMineralsEnv(Env):
         # TODO: Objects related to render_modes should eb initialized here.
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
+        self.renderer = Renderer() if render_mode == "human" else None
         self.reward_range = (-inf, inf)  # TODO: change to desired
         self.spec: EnvSpec | None = None
 
@@ -125,46 +129,26 @@ class NotEnoughMineralsEnv(Env):
         return {}  # TODO: maybe there is an use case for it?
 
     def render(self) -> RenderFrame | list[RenderFrame] | None:
-        ...  # TODO
+        if self.renderer is not None:
+            self.renderer.render(self._get_obs())
+
+        return None  # TODO: return RenderFrame
 
     def close(self) -> None:
         ...  # TODO
 
 
-# if __name__ == "__main__":
-# blueprints = load_blueprints(DAY_19_INPUT_FILE_PATH)
-# robots_costs_boundaries, costs_boundaries = extract_global_data(blueprints)
-#
-# max_time = 24
-#
-# env = NotEnoughMineralsEnv(
-#     blueprint=blueprints[0],
-#     max_time=max_time,
-#     robots_costs_boundaries=robots_costs_boundaries,
-# )
-#
-# obs, _ = env.reset()
-#
-# print(f"observation: {obs}")
-# print(f"observation type: {type(obs)}")
-# flatten_observation = flatten(env.observation_space, obs)
-# print(f"flatten observation: {flatten_observation}")
-# print(f"flatten observation type: {type(flatten_observation)}")
-#
-# action = env.action_space.sample()
-# print(f"action: {action}")
-# print(f"action type: {type(action)}")
-# flatten_action = flatten(env.action_space, action)
-# print(f"flatten action: {flatten_action}")
-# print(f"flatten action type: {type(flatten_action)}")
-#
-# print(obs)
-#
-# obs, _, _, _, _ = env.step(1)  # type: ignore[assignment]
-#
-# print(obs)
-#
-# fs = flatten_space(env.observation_space)
-#
-# print("xd")
-# print("lol")
+if __name__ == "__main__":
+    blueprints = load_blueprints(DAY_19_INPUT_FILE_PATH)
+    robots_costs_boundaries, costs_boundaries = extract_global_data(blueprints)
+
+    max_time = 24
+
+    env = NotEnoughMineralsEnv(
+        blueprint=blueprints[0],
+        max_time=max_time,
+        robots_costs_boundaries=robots_costs_boundaries,
+    )
+
+    obs, _ = env.reset()
+    env.render()
