@@ -6,7 +6,10 @@ from day19.rl.env.constants import ROBOT_TYPES
 
 ACTION_TO_ROBOT_TYPE_MAPPING = ROBOT_TYPES + (None,)
 
-Action = int
+
+class Action(int):
+    # noinspection PyMethodMayBeStatic
+    NOOP = -1
 
 
 def generate_action_space() -> Discrete:

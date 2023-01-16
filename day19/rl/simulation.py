@@ -10,13 +10,18 @@ from time import sleep
 
 import torch
 from gymnasium import Env
+from gymnasium.utils.env_checker import check_env
+from gymnasium.utils.play import play
+from pygame import K_SPACE
 from torch.utils.tensorboard import SummaryWriter
 from tqdm.auto import tqdm, trange
 
 from day19.constants import DAY_19_INPUT_FILE_PATH, DAY_19_LOG_DIR
 from day19.rl.agent.td3_agent import TD3Agent
 from day19.rl.data_loading import extract_global_data, load_blueprints
-from day19.rl.env.environment import NotEnoughMineralsEnv
+from day19.rl.env.action import Action
+from day19.rl.env.environment import NotEnoughMineralsEnv, Noop
+
 
 # TODO:
 #  Rethink simulation, agent and environment relations - create new architecture that:
@@ -35,7 +40,7 @@ def simulate(
     agent: TD3Agent,  # TODO: create an abstract agent class
     episodes: int,
     max_episode_steps: int,
-    render: bool | str = True,
+    render: bool = True,
     episodes_pb=True,  # TODO: maybe remove this argument.
     steps_pb=True,  # TODO: maybe remove this argument.
 ) -> None:  # TODO: Maybe simulation should return some results that could be analysed/saved.
@@ -59,9 +64,8 @@ def simulate(
             total=max_episode_steps, position=1, leave=False, disable=(not steps_pb)
         ) as pbar:
             while True:
-                if render is not None:
+                if render:
                     env.render()
-                    # sleep(1)
 
                 action = agent.act(obs)
                 next_obs, reward, terminated, _, _ = env.step(action)
@@ -99,12 +103,10 @@ if __name__ == "__main__":
     robots_costs_boundaries, costs_boundaries = extract_global_data(blueprints)
 
     MAX_TIME = 24
-    render_mode = "human"
     environment = NotEnoughMineralsEnv(
         blueprint=blueprints[0],
         max_time=MAX_TIME,
         robots_costs_boundaries=robots_costs_boundaries,
-        render_mode=render_mode
     )
 
     # Agent
@@ -127,42 +129,36 @@ if __name__ == "__main__":
         writer=writer,
         device="cpu",
         act_noise=0.4,
-        target_noise=0.25,
+        target_noise=0.1,
         noise_clip=0.5,
         policy_delay=2,
     )
 
-    # Render test
+    # print(check_env(environment))
+
+
+
+    # Training
     simulate(
         environment,
         training_agent,
-        episodes=1,
-        render=render_mode,
+        episodes=1600,
+        render=False,
         max_episode_steps=MAX_TIME,
     )
 
-    # # Training
-    # simulate(
-    #     environment,
-    #     training_agent,
-    #     episodes=800,
-    #     render=False,
-    #     max_episode_steps=MAX_TIME,
-    # )
-    #
-    # # Evaluation
-    # training_agent.exploration = False
-    # simulate(
-    #     environment,
-    #     training_agent,
-    #     episodes=100,
-    #     render=False,
-    #     max_episode_steps=MAX_TIME,
-    # )
+    # Evaluation
+    training_agent.exploration = False
+    simulate(
+        environment,
+        training_agent,
+        episodes=100,
+        render=False,
+        max_episode_steps=MAX_TIME,
+    )
 
 
 # TODO:
-#  -> playable pygame to make sure environment is valid
 #  -> prioritized replay buffer
 #  -> noise, clamping, exploration <- there is a mess
 #  -> repo related stuff

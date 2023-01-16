@@ -3,10 +3,12 @@
 
 from time import sleep, time
 
+import numpy as np
 import pygame
 
 # TODO: apply naming hierarchy resources: stones, robots in the whole project
 # TODO: suppress pygame log
+from numpy import ndarray
 
 from day19.constants import DAY_19_INPUT_FILE_PATH
 from day19.rl.data_loading import load_blueprints, extract_global_data
@@ -34,7 +36,10 @@ class Renderer:
         TimeIndicators,
     )
 
-    def __init__(self, window_size=500, render_fps=4):
+    def __init__(self, render_mode, window_size=500, render_fps=4):
+        if render_mode is False:
+            return  # TODO: do it better
+        self.render_mode = render_mode
         self.window_size = window_size
         self.box_size = int(self.window_size / 6)
 
@@ -57,15 +62,22 @@ class Renderer:
             for clazz in self._components_classes
         ]
 
-    def render(self, obs: Observation) -> None:
+    def render(self, obs: Observation) -> None | ndarray:
         self.canvas.fill(color=WHITE)
 
         for component in self._components:
             component.render(obs)
 
-        self.window.blit(self.canvas, self.canvas.get_rect())
-        pygame.event.pump()
-        pygame.display.update()
+        if self.render_mode is None:
+            pass
+        elif self.render_mode == "human":
+            self.window.blit(self.canvas, self.canvas.get_rect())
+            pygame.event.pump()
+            pygame.display.update()
+        elif self.render_mode == "rgb_array":
+            return np.transpose(
+                np.array(pygame.surfarray.pixels3d(self.canvas)), axes=(1, 0, 2)
+            )
 
         self.clock.tick(self.render_fps)
 

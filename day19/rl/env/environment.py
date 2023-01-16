@@ -28,6 +28,10 @@ from day19.rl.env.state import State
 # TODO: pygame
 
 
+class Noop(Action):
+    pass
+
+
 class NotEnoughMineralsEnv(Env):
     """ "Not Enough Materials" environment.
     It represents the problem described in the Day 19 of the Advent of Code 2022 challenge.
@@ -42,9 +46,9 @@ class NotEnoughMineralsEnv(Env):
             None,
             "human",
             "rgb_array",
-            "ansi",
-            "rgb_array_list",
-            "ansi_list",
+            # "ansi",
+            # "rgb_array_list",
+            # "ansi_list",
         ]
         # TODO: research what is it all about
     }
@@ -70,9 +74,12 @@ class NotEnoughMineralsEnv(Env):
         # TODO: Objects related to render_modes should eb initialized here.
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
-        self.renderer = Renderer() if render_mode == "human" else None
-        self.reward_range = (-inf, inf)  # TODO: change to desired
+        self.renderer = Renderer(self.render_mode)
+        self.reward_range = (0, inf)
         self.spec: EnvSpec | None = None
+        self._keys_to_action = {
+            key: Action(i) for i, key in enumerate(["a", "s", "d", "f", " "])
+        }
 
     def reset(
         self, *, seed: int | None = None, options: dict[str, Any] | None = None
@@ -83,38 +90,39 @@ class NotEnoughMineralsEnv(Env):
 
     # noinspection PyShadowingNames
     def step(
-        self, action: Action
+        self, action: Action | Noop
     ) -> tuple[Observation, SupportsFloat, bool, bool, dict[str, Any]]:
-        old_robots = deepcopy(self._last_state[ROBOTS])
+        if action != Action.NOOP:  # TODO: it's hack for making it playable, do it better
+            old_robots = deepcopy(self._last_state[ROBOTS])
 
-        # Produce robot if needed and possible
-        robot_type = ACTION_TO_ROBOT_TYPE_MAPPING[action]
-        # Assumption: when agent tries to make action that is not available
-        # then the Empty/None/Null action is taken. It sounds reasonable
-        # because it's like trying to do something impossible - if you try
-        # to do it, nothing happens.
+            # Produce robot if needed and possible
+            robot_type = ACTION_TO_ROBOT_TYPE_MAPPING[action]
+            # Assumption: when agent tries to make action that is not available
+            # then the Empty/None/Null action is taken. It sounds reasonable
+            # because it's like trying to do something impossible - if you try
+            # to do it, nothing happens.
 
-        # TODO: if there is a bug, it can be related to this line!!!
-        if robot_type is not None:
-            new_stones = {
-                st: self._last_state[STONES][st] - self.blueprint[robot_type].get(st, 0)
-                for st in STONE_TYPES
+            # TODO: if there is a bug, it can be related to this line!!!
+            if robot_type is not None:
+                new_stones = {
+                    st: self._last_state[STONES][st] - self.blueprint[robot_type].get(st, 0)
+                    for st in STONE_TYPES
+                }
+                if min(new_stones.values()) >= 0:
+                    self._last_state[STONES] = new_stones
+                    self._last_state[ROBOTS][robot_type] += 1
+
+            # Produce stones based on the original robots number
+            self._last_state[STONES] = {
+                st: self._last_state[STONES][st] + old_robots[st] for st in STONE_TYPES
             }
-            if min(new_stones.values()) >= 0:
-                self._last_state[STONES] = new_stones
-                self._last_state[ROBOTS][robot_type] += 1
 
-        # Produce stones based on the original robots number
-        self._last_state[STONES] = {
-            st: self._last_state[STONES][st] + old_robots[st] for st in STONE_TYPES
-        }
-
-        # Update time
-        self._last_state[TIME] += 1
+            # Update time
+            self._last_state[TIME] += 1
 
         # Produce result
         observation = self._get_obs()
-        reward = self._last_state[STONES][GEODE]
+        reward = float(self._last_state[STONES][GEODE])
         terminated = self._last_state[TIME].item() == self.max_time
         truncated = False  # TODO: maybe there is an use case for it?
         info = self._get_info()
@@ -129,13 +137,13 @@ class NotEnoughMineralsEnv(Env):
         return {}  # TODO: maybe there is an use case for it?
 
     def render(self) -> RenderFrame | list[RenderFrame] | None:
-        if self.renderer is not None:
-            self.renderer.render(self._get_obs())
-
-        return None  # TODO: return RenderFrame
+        return self.renderer.render(self._get_obs())
 
     def close(self) -> None:
-        ...  # TODO
+        self.renderer.close()
+
+    def get_keys_to_action(self):
+        return self._keys_to_action
 
 
 if __name__ == "__main__":
