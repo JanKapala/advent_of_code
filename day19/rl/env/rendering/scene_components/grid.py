@@ -1,3 +1,7 @@
+# pylint: disable=too-few-public-methods
+
+"""Grid of the game representation."""
+
 import pygame
 
 from day19.rl.env.observation import Observation
@@ -5,6 +9,8 @@ from day19.rl.env.rendering.scene_components.scene_component import SceneCompone
 
 
 class Grid(SceneComponent):
+    """Grid drawn by the pygame during the game frame rendering"""
+
     def render(self, _obs: Observation):
         for i in range(4):
             pygame.draw.line(

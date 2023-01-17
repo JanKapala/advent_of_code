@@ -10,7 +10,7 @@ from typing import SupportsFloat, cast
 import torch
 from gymnasium import Space
 from gymnasium.spaces import flatten, flatten_space
-from torch import Tensor, set_grad_enabled
+from torch import Tensor
 from torch.nn import DataParallel, MSELoss
 from torch.optim import Adam
 from torch.utils.tensorboard import SummaryWriter
@@ -26,6 +26,9 @@ from day19.rl.env.observation import Observation
 # TODO: enable some pylint checkers that has been disabled currently.
 
 # TODO: tree search?
+# TODO: noise, clamping, exploration <- there is a mess
+# TODO: agent decomposition into the better classes structure
+
 
 # noinspection NonAsciiCharacters
 class TD3Agent:

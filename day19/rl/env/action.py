@@ -8,8 +8,10 @@ ACTION_TO_ROBOT_TYPE_MAPPING = ROBOT_TYPES + (None,)
 
 
 class Action(int):
+    """Action interface between the Agent and the Environment"""
+
     # noinspection PyMethodMayBeStatic
-    NOOP = -1
+    NOOP = -1  # Special Action needed for `gymnasium.utils.play(...)`
 
 
 def generate_action_space() -> Discrete:

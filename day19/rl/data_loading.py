@@ -2,7 +2,7 @@
 
 from math import inf
 
-from day19.rl.env.blueprints import Blueprint
+from day19.rl.env.blueprint import Blueprint
 from day19.rl.env.constants import CLAY, GEODE, HIGH, LOW, OBSIDIAN, ORE, ROBOT_TYPES
 from day19.rl.env.utils import PrettyDict
 

@@ -7,7 +7,7 @@ import numpy as np
 from gymnasium import Space
 from gymnasium.spaces import Box, Dict
 
-from day19.rl.env.blueprints import Blueprint
+from day19.rl.env.blueprint import Blueprint
 from day19.rl.env.constants import (
     BLUEPRINT,
     CLAY,

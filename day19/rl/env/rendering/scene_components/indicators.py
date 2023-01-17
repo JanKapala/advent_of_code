@@ -1,3 +1,5 @@
+"""Indicators needed for the rendering of the environment scene."""
+
 from abc import abstractmethod, ABC
 
 import pygame
@@ -22,7 +24,15 @@ from day19.rl.env.rendering.scene_components.scene_component import SceneCompone
 
 
 class Indicators(SceneComponent):
+    """Base class for indicators"""
+
     def __init__(self, canvas, window_size: int, box_size: int) -> None:
+        """
+
+        :param canvas: Pygame Canvas.
+        :param window_size:
+        :param box_size:
+        """
         super().__init__(canvas, window_size, box_size)
 
         self.horizontal_resources_text_offset: int = int(0.3 * self.box_size)
@@ -32,6 +42,12 @@ class Indicators(SceneComponent):
 
     @abstractmethod
     def render(self, obs: Observation) -> None:
+        """Render into the canvas.
+
+        :param obs: An element of the environment’s observation_space.
+        :return:
+        """
+
         raise NotImplementedError()
 
 

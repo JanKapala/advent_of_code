@@ -22,6 +22,7 @@ Record: TypeAlias = tuple[Tensor, Tensor, Tensor, Tensor, Tensor]
 #  offences everything in pytorch causes it xD
 
 # TODO: implement in optimal way: no observations duplications
+# TODO: prioritized replay buffer
 
 
 class ReplayBuffer:

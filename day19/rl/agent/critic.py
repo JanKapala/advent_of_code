@@ -2,7 +2,7 @@
 
 """Critic Model implementation"""
 
-from torch import Tensor, cat, rand
+from torch import Tensor, cat
 from torch.nn import Module, ReLU, Sequential
 
 from day19.rl.agent.base_neural_network import BaseNeuralNetwork
@@ -26,20 +26,3 @@ class Critic(Module, BaseNeuralNetwork):
         """Performs forward propagation."""
 
         return self.network(cat([O, A], dim=1))
-
-
-if __name__ == "__main__":
-    O_shape = 16
-    A_shape = 5
-    shape = O_shape + A_shape
-
-    batch_size = 16
-
-    O = rand((batch_size, O_shape))
-    A = rand(batch_size, A_shape)
-    critic = Critic(input_dim=shape, layer_sizes=[4, 8, 4])
-
-    A = critic(O, A)
-
-    for p in critic.parameters():
-        print(p.data)

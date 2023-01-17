@@ -9,35 +9,30 @@ from typing import Any, SupportsFloat
 from gymnasium import Env
 from gymnasium.core import RenderFrame
 from gymnasium.envs.registration import EnvSpec
-
-from day19.constants import DAY_19_INPUT_FILE_PATH
-from day19.rl.data_loading import load_blueprints, extract_global_data
 from day19.rl.env.action import (
     ACTION_TO_ROBOT_TYPE_MAPPING,
     Action,
     generate_action_space,
 )
-from day19.rl.env.blueprints import Blueprint
+from day19.rl.env.blueprint import Blueprint
 from day19.rl.env.constants import GEODE, ROBOTS, STONE_TYPES, STONES, TIME
 from day19.rl.env.observation import Observation, generate_observation_space
 from day19.rl.env.rendering.renderer import Renderer
 from day19.rl.env.state import State
 
-# TODO: play utility from gymnasium
-# TODO: logging with structlog and tensorboard
-# TODO: pygame
-
-
-class Noop(Action):
-    pass
+# TODO: Maybe use structlog alongside with tensorboard
+# TODO: Log environment statistics using SummaryWriter.
+# TODO: Publish environment.
 
 
 class NotEnoughMineralsEnv(Env):
     """ "Not Enough Materials" environment.
-    It represents the problem described in the Day 19 of the Advent of Code 2022 challenge.
+    It represents the problem described in the Day 19 of the Advent of Code
+     2022 challenge.
     Full description of the problem and input data can be found here:
      https://adventofcode.com/2022/day/19
-    Use functions from `data_loading` module to obtain data needed for the creation of the
+    Use functions from `data_loading` module to obtain data needed for the
+     creation of the
      environment.
     """
 
@@ -70,12 +65,14 @@ class NotEnoughMineralsEnv(Env):
             self.max_time, self.robots_costs_boundaries
         )
         self.action_space = generate_action_space()
+        self.reward_range = (0, inf)
 
-        # TODO: Objects related to render_modes should eb initialized here.
         assert render_mode is None or render_mode in self.metadata["render_modes"]
+
+        # TODO: refactor below 2 lines
         self.render_mode = render_mode
         self.renderer = Renderer(self.render_mode)
-        self.reward_range = (0, inf)
+
         self.spec: EnvSpec | None = None
         self._keys_to_action = {
             key: Action(i) for i, key in enumerate(["a", "s", "d", "f", " "])
@@ -84,15 +81,47 @@ class NotEnoughMineralsEnv(Env):
     def reset(
         self, *, seed: int | None = None, options: dict[str, Any] | None = None
     ) -> tuple[Observation, dict[str, Any]]:
+        """Reset the environment to the beginning state.
+
+        :param seed: PRNG seed.
+        :param options: Additional information to specify how the environment
+         is reset.
+        :return:
+            observation: An element of the environment’s observation_space as
+             the next observation due to the agent actions.
+            info: Contains auxiliary diagnostic information (helpful for
+             debugging, learning, and logging).
+        """
         super().reset(seed=seed)
         self._last_state = State()
         return self._get_obs(), self._get_info()
 
     # noinspection PyShadowingNames
     def step(
-        self, action: Action | Noop
+        self, action: Action
     ) -> tuple[Observation, SupportsFloat, bool, bool, dict[str, Any]]:
-        if action != Action.NOOP:  # TODO: it's hack for making it playable, do it better
+        """
+
+        :param action: Action that will be applied to the current environment
+        state.
+        :return:
+            observation: An element of the environment’s observation_space as
+             the next observation due to the agent actions.
+            reward: The reward as a result of taking the action.
+            terminated: Whether the agent reaches the terminal state (as
+             defined under the MDP of the task) which can be positive or
+             negative. If true, the user needs to call `env.reset(...)`.
+            truncated: Whether the truncation condition outside the scope of
+             the MDP is satisfied. Typically, this is a timelimit, but could
+             also be used to indicate an agent physically going out of bounds.
+             Can be used to end the episode prematurely before a terminal
+             state is reached. If true, the user needs to call `env.reset(...)`.
+            info: Contains auxiliary diagnostic information (helpful for
+            debugging, learning, and logging).
+        """
+        if (
+            action != Action.NOOP
+        ):  # TODO: it's hack for making it playable, do it better
             old_robots = deepcopy(self._last_state[ROBOTS])
 
             # Produce robot if needed and possible
@@ -105,7 +134,8 @@ class NotEnoughMineralsEnv(Env):
             # TODO: if there is a bug, it can be related to this line!!!
             if robot_type is not None:
                 new_stones = {
-                    st: self._last_state[STONES][st] - self.blueprint[robot_type].get(st, 0)
+                    st: self._last_state[STONES][st]
+                    - self.blueprint[robot_type].get(st, 0)
                     for st in STONE_TYPES
                 }
                 if min(new_stones.values()) >= 0:
@@ -137,26 +167,22 @@ class NotEnoughMineralsEnv(Env):
         return {}  # TODO: maybe there is an use case for it?
 
     def render(self) -> RenderFrame | list[RenderFrame] | None:
+        """TODO
+
+        :return: TODO
+        """
         return self.renderer.render(self._get_obs())
 
     def close(self) -> None:
+        """After the user has finished using the environment, close contains the
+         code necessary to “clean up” the environment. This is critical for
+          closing rendering windows"""
         self.renderer.close()
 
-    def get_keys_to_action(self):
+    def get_keys_to_action(self) -> dict[str, Action]:
+        """Method for accessing the key-to-action mapping needed by the
+         `gymnasium.utils.play.play(...)`
+
+        :return:
+        """
         return self._keys_to_action
-
-
-if __name__ == "__main__":
-    blueprints = load_blueprints(DAY_19_INPUT_FILE_PATH)
-    robots_costs_boundaries, costs_boundaries = extract_global_data(blueprints)
-
-    max_time = 24
-
-    env = NotEnoughMineralsEnv(
-        blueprint=blueprints[0],
-        max_time=max_time,
-        robots_costs_boundaries=robots_costs_boundaries,
-    )
-
-    obs, _ = env.reset()
-    env.render()

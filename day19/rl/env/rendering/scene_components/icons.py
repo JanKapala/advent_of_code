@@ -1,5 +1,9 @@
+# pylint: disable=too-few-public-methods
+
+"""Icons needed for the rendering of the environment scene."""
+
 import os
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 import pygame
 
@@ -8,7 +12,9 @@ from day19.rl.env.observation import Observation
 from day19.rl.env.rendering.scene_components.scene_component import SceneComponent
 
 
-class Icon(SceneComponent):
+class Icon(SceneComponent, ABC):
+    """Image icon that can be rendered using pygame."""
+
     icon_scale = 0.8
     icon_offset = (1 - icon_scale) / 2
 
@@ -17,12 +23,10 @@ class Icon(SceneComponent):
             icon, (self.box_size * self.icon_scale, self.box_size * self.icon_scale)
         )
 
-    @abstractmethod
-    def _coords(self, i) -> tuple[int, int]:
-        raise NotImplementedError()
 
+class ResourcesIcons(Icon, ABC):
+    """Row of image icons that can be rendered using pygame."""
 
-class ResourcesIcons(Icon):  # TODO: change name to ResourcesIcons
     name_suffix = None
     icons_subdir_name = None
 
@@ -44,8 +48,14 @@ class ResourcesIcons(Icon):  # TODO: change name to ResourcesIcons
             rect = rect.move(self._coords(i))
             self.canvas.blit(self.icons[i], rect)
 
+    @abstractmethod
+    def _coords(self, i) -> tuple[int, int]:
+        raise NotImplementedError()
+
 
 class RobotsIcons(ResourcesIcons):
+    """Row of robots icons that can be rendered using pygame."""
+
     name_suffix = "_robot_icon.png"
     icons_subdir_name = "robots"
 
@@ -55,7 +65,9 @@ class RobotsIcons(ResourcesIcons):
         ) * self.box_size
 
 
-class StonesIcons(ResourcesIcons):  # TODO: change name to StonesIcons
+class StonesIcons(ResourcesIcons):
+    """Row of stones icons that can be rendered using pygame."""
+
     name_suffix = "_stone_icon.png"
     icons_subdir_name = "resources"
 
