@@ -1,9 +1,9 @@
 # TODO
 from gymnasium.utils.env_checker import check_env
 
-from constants import DAY_19_INPUT_FILE_PATH
-from advent_of_code.day19.data_loading import load_blueprints, extract_global_data
+from advent_of_code.day19.data_loading import extract_global_data, load_blueprints
 from advent_of_code.day19.env.environment import NotEnoughMineralsEnv
+from constants import DAY_19_INPUT_FILE_PATH
 
 
 def test_environment():

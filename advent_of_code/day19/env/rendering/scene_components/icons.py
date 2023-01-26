@@ -3,11 +3,11 @@
 """Icons needed for the rendering of the environment scene."""
 
 import os
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 import pygame
 
-from advent_of_code.day19.env.constants import STONE_TYPES, ASSETS_PATH
+from advent_of_code.day19.env.constants import ASSETS_PATH, STONE_TYPES
 from advent_of_code.day19.env.observation import Observation
 from advent_of_code.day19.env.rendering.scene_components.scene_component import (
     SceneComponent,

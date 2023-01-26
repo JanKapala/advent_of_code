@@ -7,9 +7,10 @@ from collections import deque
 from typing import Deque, TypeAlias, cast
 
 import torch
+from torch import Tensor
+
 from advent_of_code.day19.env.action import Action
 from advent_of_code.day19.env.observation import Observation
-from torch import Tensor
 
 OBSERVATION = "observation"
 ACTION = "action"

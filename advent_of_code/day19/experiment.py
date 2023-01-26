@@ -5,14 +5,15 @@ from datetime import datetime
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
-from constants import DAY_19_LOG_DIR, DAY_19_INPUT_FILE_PATH
 from advent_of_code.day19.agent.td3_agent import TD3Agent
-from advent_of_code.day19.data_loading import load_blueprints, extract_global_data
+from advent_of_code.day19.data_loading import extract_global_data, load_blueprints
 from advent_of_code.day19.env.environment import NotEnoughMineralsEnv
 from advent_of_code.day19.simulation import simulate
+from constants import DAY_19_INPUT_FILE_PATH, DAY_19_LOG_DIR
 
 # TODO: repo related stuff
-# TODO: scale reward and return, or maybe better: create interpreter (related to the architecture change)
+# TODO: scale reward and return, or maybe
+#  better: create interpreter (related to the architecture change)
 
 
 if __name__ == "__main__":

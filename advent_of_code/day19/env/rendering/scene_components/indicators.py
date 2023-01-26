@@ -1,22 +1,22 @@
 """Indicators needed for the rendering of the environment scene."""
 
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 import pygame
 
 from advent_of_code.day19.env.constants import (
+    BLUEPRINT,
+    CLAY,
+    GEODE,
+    MAX_TIME,
+    OBSIDIAN,
+    ORE,
+    ROBOT_TYPES,
+    ROBOTS,
     STATE,
     STONE_TYPES,
     STONES,
-    ROBOTS,
-    BLUEPRINT,
-    ORE,
-    ROBOT_TYPES,
-    OBSIDIAN,
-    CLAY,
-    GEODE,
     TIME,
-    MAX_TIME,
 )
 from advent_of_code.day19.env.observation import Observation
 from advent_of_code.day19.env.rendering.colors import BLACK

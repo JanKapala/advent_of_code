@@ -1,7 +1,7 @@
 # TODO
 
 
-from torch import rand, Tensor
+from torch import Tensor, rand
 
 from advent_of_code.day19.agent.critic import Critic
 

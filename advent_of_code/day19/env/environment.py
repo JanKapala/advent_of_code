@@ -9,6 +9,7 @@ from typing import Any, SupportsFloat
 from gymnasium import Env
 from gymnasium.core import RenderFrame
 from gymnasium.envs.registration import EnvSpec
+
 from advent_of_code.day19.env.action import (
     ACTION_TO_ROBOT_TYPE_MAPPING,
     Action,

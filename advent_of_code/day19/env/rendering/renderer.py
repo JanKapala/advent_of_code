@@ -10,8 +10,7 @@ import pygame
 # TODO: suppress pygame log
 from numpy import ndarray
 
-from constants import DAY_19_INPUT_FILE_PATH
-from advent_of_code.day19.data_loading import load_blueprints, extract_global_data
+from advent_of_code.day19.data_loading import extract_global_data, load_blueprints
 from advent_of_code.day19.env.observation import Observation
 from advent_of_code.day19.env.rendering.colors import WHITE
 from advent_of_code.day19.env.rendering.scene_components.grid import Grid
@@ -20,12 +19,13 @@ from advent_of_code.day19.env.rendering.scene_components.icons import (
     StonesIcons,
 )
 from advent_of_code.day19.env.rendering.scene_components.indicators import (
-    StonesIndicators,
-    RobotsIndicators,
     BlueprintIndicators,
+    RobotsIndicators,
+    StonesIndicators,
     TimeIndicators,
 )
 from advent_of_code.day19.env.state import State
+from constants import DAY_19_INPUT_FILE_PATH
 
 
 class Renderer:
