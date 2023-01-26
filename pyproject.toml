@@ -17,6 +17,7 @@ dependencies = [
     "gymnasium>=0.27.1",
     "tqdm>=4.64.1",
     "notebook>=6.5.2",
+    "sphinx>=6.1.3",
 ]
 
 
