@@ -1,13 +1,8 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Build](https://github.com/JanKapala/advent_of_code/actions/workflows/python-app.yml/badge.svg)](https://github.com/JanKapala/advent_of_code/actions/workflows/python-app.yml)
 
-# Awakeit
-
-### Mission
-Make NPCs in games more alive, interesting and spectacular by awakening their intelligence!
-
-### Conceptual approach
-Conceptual framework used for achieving above goal is `Reinforcement Learning`.
+# Advent of Code 2022 RL
+RL solutions to the Advent of Code 2022 problems.
 
 ### Project setup
 

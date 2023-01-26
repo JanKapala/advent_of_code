@@ -1,7 +1,7 @@
 [project]
 name = "advent_of_code"
 version = "0.1.0"
-description = "AI solutions to the Advent of Code 2022 problems."
+description = "RL solutions to the Advent of Code 2022 problems."
 authors = [
     {name = "Jan Kapała", email = "jankapala@gmail.com"},
 ]
