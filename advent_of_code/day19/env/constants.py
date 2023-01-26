@@ -8,7 +8,7 @@ import os
 
 import numpy as np
 
-from constants import DAY_19_ROOT_DIR
+from advent_of_code.day19.constants import DAY_19_ROOT_DIR
 
 STONES = "stones"
 ROBOTS = "robots"

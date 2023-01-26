@@ -1,5 +1,7 @@
 .pdm.toml
 __pypackages__/
+runs/*
+!runs/day19/.gitkeep
 
 
 

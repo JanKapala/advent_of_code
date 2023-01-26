@@ -9,7 +9,7 @@ from advent_of_code.day19.agent.td3_agent import TD3Agent
 from advent_of_code.day19.data_loading import extract_global_data, load_blueprints
 from advent_of_code.day19.env.environment import NotEnoughMineralsEnv
 from advent_of_code.day19.simulation import simulate
-from constants import DAY_19_INPUT_FILE_PATH, DAY_19_LOG_DIR
+from advent_of_code.day19.constants import DAY_19_LOG_DIR, DAY_19_INPUT_FILE_PATH
 
 # TODO: repo related stuff
 # TODO: scale reward and return, or maybe

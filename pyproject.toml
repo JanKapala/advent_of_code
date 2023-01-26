@@ -65,8 +65,8 @@ isort_run = "pdm run isort advent_of_code tests"
 
 pylint_check = "pdm run pylint --jobs=0 --recursive=y advent_of_code tests"
 
-realtime_tensorboard.cmd = "tensorboard --logdir=$LOGDIR --load_fast=true"
-realtime_tensorboard.env = {LOGDIR = "./runs"}
+realtime_tensorboard.cmd = "pdm run tensorboard --logdir=$LOGDIR --load_fast=true"
+realtime_tensorboard.env = {LOGDIR = "runs"}
 
 
 [tool.mypy]

@@ -3,7 +3,7 @@ from gymnasium.utils.play import play
 from advent_of_code.day19.data_loading import extract_global_data, load_blueprints
 from advent_of_code.day19.env.action import Action
 from advent_of_code.day19.env.environment import NotEnoughMineralsEnv
-from constants import DAY_19_INPUT_FILE_PATH
+from advent_of_code.day19.constants import DAY_19_INPUT_FILE_PATH
 
 if __name__ == "__main__":
     blueprints = load_blueprints(DAY_19_INPUT_FILE_PATH)

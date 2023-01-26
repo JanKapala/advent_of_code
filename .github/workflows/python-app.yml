@@ -1,0 +1,53 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+        
+    - name: Install pyenv and Python 3.11.1
+      uses: "gabrielfalcao/pyenv-action@v11"
+      with:
+          default: 3.11.1
+
+    - name: Install PDM
+      uses: pdm-project/setup-pdm@v3
+      with:
+        python-version: 3.11.1
+        enable-pep582: true
+        cache: true
+
+    - name: Install project dependencies
+      run: pdm sync
+
+    - name: Check typing with MyPy
+      run: |
+        pdm run mypy_check
+        
+    - name: Check code formatting with Black
+      run: |
+        pdm run black_check
+
+    - name: Sort imports with isort
+      run: |
+        pdm run isort_check
+
+    - name: Lint with pylint
+      run: |
+        pdm run pylint_check
+
+    - name: Test with randomized parallel pytest coverage
+      run: |
+        pdm run tests

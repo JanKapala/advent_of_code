@@ -25,7 +25,7 @@ from advent_of_code.day19.env.rendering.scene_components.indicators import (
     TimeIndicators,
 )
 from advent_of_code.day19.env.state import State
-from constants import DAY_19_INPUT_FILE_PATH
+from advent_of_code.day19.constants import DAY_19_INPUT_FILE_PATH
 
 
 class Renderer:
