@@ -1,0 +1,24 @@
+repos:
+-   repo: local
+    hooks:
+    -   id: mypy
+        name: mypy
+        entry: pdm run mypy_check
+        language: system
+        types: [ python ]
+        pass_filenames: false
+    -   id: black
+        name: black
+        entry: pdm run black_check
+        language: system
+        types: [ python ]
+    -   id: isort
+        name: isort
+        entry: pdm run isort_check
+        language: system
+        types: [ python ]
+    -   id: pylint
+        name: pylint
+        entry: pdm run pylint_check
+        language: system
+        types: [ python ]

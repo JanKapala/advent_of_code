@@ -1,31 +1,88 @@
-[tool.poetry]
-name = "advent-of-code"
+[project]
+name = "advent_of_code"
 version = "0.1.0"
-description = ""
-authors = ["Jan Kapala <jan.kapala@ocado.com>"]
+description = "AI solutions to the Advent of Code 2022 problems."
+authors = [
+    {name = "Jan Kapała", email = "jankapala@gmail.com"},
+]
+license = {text = "MIT"}
 readme = "README.md"
-packages = [{include = "advent_of_code"}]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-matplotlib = "^3.6.2"
-pandas = "^1.5.2"
-numpy = "^1.24.1"
-tensorboard = "^2.11.0"
-pylint = "^2.15.10"
-black = "^22.12.0"
-mypy = "^0.991"
-notebook = "^6.5.2"
-jupyter = "^1.0.0"
-torch = "^1.13.1"
-gymnasium = "^0.27.0"
-tqdm = "^4.64.1"
-pygame = "^2.1.2"
-isort = "^5.11.4"
-pytest = "^7.2.1"
+requires-python = ">=3.11"
+dependencies = [
+    "pygame>=2.1.3.dev8",
+    "numpy>=1.24.1",
+    "pandas>=1.5.3",
+    "torch>=1.13.1",
+    "gymnasium>=0.27.1",
+    "tqdm>=4.64.1",
+    "notebook>=6.5.2",
+]
 
+
+[project.optional-dependencies]
+visualisation = [
+    "matplotlib>=3.6.3",
+    "tensorboard>=2.11.2",
+]
+
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+testing = [
+    "pytest>=7.2.1",
+    "hypothesis>=6.65.1",
+    "factory-boy>=3.2.1",
+    "pytest-xdist>=3.1.0",
+    "pytest-randomly>=3.12.0",
+    "pytest-mock>=3.10.0",
+    "coverage[toml]>=7.1.0",
+    "pytest-cov>=4.0.0",
+]
+clean-code = [
+    "pylint>=2.15.10",
+    "black>=22.12.0",
+    "mypy>=0.991",
+    "isort>=5.11.4",
+    "pre-commit>=3.0.1",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"
 
+[tool.pdm.scripts]
+post_install = {shell = "cp $PDM_PROJECT_ROOT/utils/pre-commit $PDM_PROJECT_ROOT/.git/hooks/pre-commit"}
+
+tests = "pytest -n auto --randomly-seed=1234 --cov=advent_of_code tests"
+
+mypy_check = "pdm run mypy --install-types --non-interactive advent_of_code"
+
+black_check = "pdm run black --check advent_of_code tests"
+black_run = "pdm run black advent_of_code tests"
+
+isort_check = "pdm run isort --check advent_of_code tests"
+isort_run = "pdm run isort advent_of_code tests"
+
+pylint_check = "pdm run pylint --jobs=0 --recursive=y advent_of_code tests"
+
+realtime_tensorboard.cmd = "tensorboard --logdir=$LOGDIR --load_fast=true"
+realtime_tensorboard.env = {LOGDIR = "./runs"}
+
+
+[tool.mypy]
+ignore_missing_imports = true
+strict = true
+exclude = ["__pypackages__", "tests"]
+
+[tool.coverage.run]
+branch = true
+source = ['advent_of_code']
+concurrency = ['multiprocessing']
+
+[tool.isort]
+profile = "black"
+
+[tool.pylint]
+
+[tool.pylint.master]
+ignore-paths=["tests"]

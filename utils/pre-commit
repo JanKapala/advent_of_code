@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# start templated
+INSTALL_PDM=$(which pdm)
+ARGS=(hook-impl --config=.pre-commit-config.yaml --hook-type=pre-commit)
+# end templated
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+ARGS+=(--hook-dir "$HERE" -- "$@")
+
+if [ -x "$INSTALL_PDM" ]; then
+    exec "$INSTALL_PDM" run pre-commit "${ARGS[@]}"
+else
+    echo 'pre-commit not found. Did you install it wit other packages while executing pdm install?' 1>&2
+    exit 1
+fi
