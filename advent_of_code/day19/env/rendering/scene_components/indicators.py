@@ -20,7 +20,9 @@ from advent_of_code.day19.env.constants import (
 )
 from advent_of_code.day19.env.observation import Observation
 from advent_of_code.day19.env.rendering.colors import BLACK
-from advent_of_code.day19.env.rendering.scene_components.scene_component import SceneComponent
+from advent_of_code.day19.env.rendering.scene_components.scene_component import (
+    SceneComponent,
+)
 
 
 class Indicators(SceneComponent):

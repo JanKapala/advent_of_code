@@ -21,4 +21,6 @@ def test_environment():
     obs, _ = environment.reset()
     environment.render()
 
-    print(check_env(environment))  # TODO: Implement this test properly and as a proper test type
+    print(
+        check_env(environment)
+    )  # TODO: Implement this test properly and as a proper test type

@@ -9,7 +9,9 @@ import pygame
 
 from advent_of_code.day19.env.constants import STONE_TYPES, ASSETS_PATH
 from advent_of_code.day19.env.observation import Observation
-from advent_of_code.day19.env.rendering.scene_components.scene_component import SceneComponent
+from advent_of_code.day19.env.rendering.scene_components.scene_component import (
+    SceneComponent,
+)
 
 
 class Icon(SceneComponent, ABC):

@@ -175,8 +175,8 @@ class NotEnoughMineralsEnv(Env):
 
     def close(self) -> None:
         """After the user has finished using the environment, close contains the
-         code necessary to “clean up” the environment. This is critical for
-          closing rendering windows"""
+        code necessary to “clean up” the environment. This is critical for
+         closing rendering windows"""
         self.renderer.close()
 
     def get_keys_to_action(self) -> dict[str, Action]:

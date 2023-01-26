@@ -3,7 +3,15 @@
 from math import inf
 
 from advent_of_code.day19.env.blueprint import Blueprint
-from advent_of_code.day19.env.constants import CLAY, GEODE, HIGH, LOW, OBSIDIAN, ORE, ROBOT_TYPES
+from advent_of_code.day19.env.constants import (
+    CLAY,
+    GEODE,
+    HIGH,
+    LOW,
+    OBSIDIAN,
+    ORE,
+    ROBOT_TYPES,
+)
 from advent_of_code.day19.env.utils import PrettyDict
 
 

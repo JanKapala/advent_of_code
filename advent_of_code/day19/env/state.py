@@ -1,6 +1,14 @@
 """State of the environment NotEnoughMineralsEnv"""
 
-from advent_of_code.day19.env.constants import CLAY, GEODE, OBSIDIAN, ORE, ROBOTS, STONES, TIME
+from advent_of_code.day19.env.constants import (
+    CLAY,
+    GEODE,
+    OBSIDIAN,
+    ORE,
+    ROBOTS,
+    STONES,
+    TIME,
+)
 
 
 class State(dict):
